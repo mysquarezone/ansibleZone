@@ -1,0 +1,5 @@
+# # from galaxy for redis
+# - src: geerlingguy.redis
+
+# # from galaxy for mangodb
+# - src: undergreen.mongodb

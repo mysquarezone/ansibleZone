@@ -1,0 +1,34 @@
+---
+# tasks file for appserver
+- name: "Create Directory for Downloading Shell Script"
+  file:
+    path: "{{ folder_path }}"
+    state: directory
+    mode: 0755
+
+- name: "download shell script"
+  get_url:
+    url: https://deb.nodesource.com/setup_8.x
+    dest: "{{ folder_path }}/nodesource_setup.sh"
+    mode: 0755
+
+- name: "Execute the Downloaded Shell Script"
+  shell: "{{ folder_path }}/nodesource_setup.sh"
+
+- name: "Installing nodejs"
+  apt:
+    name: nodejs
+    state: present
+    update_cache: yes
+
+- name: "Copy hello.js code to setup folder"
+  template:
+    src: "templates/hello.js.j2"
+    dest: "{{ folder_path }}/hello.js"
+    mode: 0755
+
+- name: "Installing pm2"
+  command: "sudo npm install pm2 -g"
+
+- name: "start nodejs app"
+  command: "pm2 start {{ folder_path }}/hello.js -f"

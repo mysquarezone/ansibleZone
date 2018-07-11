@@ -1,0 +1,12 @@
+---
+# tasks file for webserver
+- name: "Install nginx"
+  package:
+    name: nginx
+    state: present
+
+- name: "Copy Default template"
+  template:
+    src: "templates/default.j2"
+    dest: "/etc/nginx/sites-available/default"
+  notify: restart_nginx

@@ -1,0 +1,93 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: "Update Packages on All Servers"
+    apt:
+     update_cache: yes
+
+- hosts: app
+  become: yes
+  vars:
+    folder_path: /home/ansible/nodesetup
+    appserver_port: 8080
+  tasks:
+  - name: "Create Directory for Downloading Shell Script"
+    file:
+      path: "{{ folder_path }}"
+      state: directory
+      mode: 0755
+  
+  - name: "download shell script"
+    get_url:
+     url: https://deb.nodesource.com/setup_8.x
+     dest: "{{ folder_path }}/nodesource_setup.sh"
+     mode: 0755
+  
+  - name: "Execute the Downloaded Shell Script"
+    shell: "{{ folder_path }}/nodesource_setup.sh"
+  
+  - name: "Installing nodejs"
+    apt:
+     name: nodejs
+     state: present
+     update_cache: yes
+  
+  # - name: "Get nodejs version"
+  #   command: sudo nodejs -v
+  #   register: nodejs_version
+    
+  # - name: "Get npm Version"
+  #   command: sudo npm -v
+  #   register: npm_version
+
+  # - name: "Display nodejs and npm versions"
+  #   debug:
+  #    var: nodejs_version
+  #   debug:
+  #     var: npm_version
+
+  - name: "Copy hello.js code to setup folder"
+    template:
+      src: "templates/hello.js.j2"
+      dest: "{{ folder_path }}/hello.js"
+      mode: 0755
+
+  - name: "Installing pm2"
+    npm:
+      name: coffee-script
+      global: yes
+    notify: "Start nodejs app"
+
+  # - name: "Start nodejs app"
+  #   command: "pm2 start {{ folder_path }}/hello.js"
+
+  handlers:
+    - name: start nodejs app
+      command: "pm2 restart {{ folder_path }}/hello.js"
+
+- hosts: web
+  become: yes
+  vars:
+    webserver_dns: ec2-13-236-182-104.ap-southeast-2.compute.amazonaws.com
+    appserver_ip: 172.31.13.126
+  tasks:
+  - name: "Install nginx"
+    package:
+      name: nginx
+      state: present
+  - name: "Copy Default template"
+    template:
+      src: "templates/default.j2"
+      dest: "/etc/nginx/sites-available/default"
+    notify: restart_nginx
+
+  handlers:
+  - name: restart_nginx
+    service:
+      name: nginx
+      state: restarted
+  
+  
+
+

@@ -1,0 +1,14 @@
+---
+# handlers file for appserver
+- name: start nodejs app
+  command: "pm2 start {{ folder_path }}/hello.js"
+
+- name: restart redis
+  service:
+    name: redis-server
+    state: restarted
+
+- name: start redis
+  service:
+    name: redis-server
+    state: started

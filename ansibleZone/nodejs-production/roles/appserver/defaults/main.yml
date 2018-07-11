@@ -1,0 +1,5 @@
+---
+# defaults file for appserver
+folder_path: /home/ansible/nodesetup
+appserver_port: 8080
+app_ip: 172.31.2.46

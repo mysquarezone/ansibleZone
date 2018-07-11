@@ -1,0 +1,8 @@
+var http = require('http');
+http.createServer(function (req, res) {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('HELLO WORLD_ANTE\n');
+  res.end(hostname);
+}).listen({{ appserver_port }}, '{{ app_ip }}');
+console.log('Server running at http://{{ app_ip }}:{{ appserver_port }}/');
+
